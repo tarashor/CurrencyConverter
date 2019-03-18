@@ -13,16 +13,15 @@ import retrofit2.http.Query
 class CurrenciesRetrofitRemoteDataSource : ICurrenciesDataSource{
     override fun getCurrencies(baseCurrency: Currency, callback: (CurrenciesDAO?) -> Unit) {
         service.getCurrencies(baseCurrency.id)
-            .enqueue(object:Callback<CurrenciesDAO>{
-
+            .enqueue(object : Callback<CurrenciesDAO> {
                 override fun onResponse(call: Call<CurrenciesDAO>, response: Response<CurrenciesDAO>) {
-                callback(response.body())
-            }
+                    callback(response.body())
+                }
 
-            override fun onFailure(call: Call<CurrenciesDAO>, t: Throwable) {
-                callback(null)
-            }
-        })
+                override fun onFailure(call: Call<CurrenciesDAO>, t: Throwable) {
+                    callback(null)
+                }
+            })
     }
 
     private val service: APIRequest

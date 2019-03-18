@@ -16,17 +16,16 @@ import com.tarashor.currencyconverter.viewmodel.CurrencyViewModel
 import java.lang.Exception
 
 class CurrenciesAdapter (val onCurrencySelected:(CurrencyViewModel)->Unit,
-                         val onCurrencyChnaged:(CurrencyViewModel)->Unit) :
+                         val onCurrencyChanged:(CurrencyViewModel)->Unit) :
     ListAdapter<CurrencyViewModel, CurrencyViewHolder>(object: DiffUtil.ItemCallback<CurrencyViewModel>(){
         override fun areItemsTheSame(p0: CurrencyViewModel, p1: CurrencyViewModel): Boolean {
-            return p0.currency.compareTo(p1.currency) == 0 && p0.isSelected == p1.isSelected
+            return p0.currency.compareTo(p1.currency) == 0
         }
 
         override fun areContentsTheSame(p0: CurrencyViewModel, p1: CurrencyViewModel): Boolean {
-            if (!p0.isSelected && !p1.isSelected)
-                return  p0.currency.compareTo(p1.currency) == 0
+            return p0.currency.compareTo(p1.currency) == 0
                     && p0.amount == p1.amount
-            else return p0.isSelected && p1.isSelected && p0.currency.compareTo(p1.currency) == 0
+                    && p0.isSelected == p1.isSelected
         }
 
         override fun getChangePayload(oldItem: CurrencyViewModel, newItem: CurrencyViewModel): Any? {
@@ -38,36 +37,29 @@ class CurrenciesAdapter (val onCurrencySelected:(CurrencyViewModel)->Unit,
             if (oldItem.amount != newItem.amount) {
                 payload = payload or AMOUNT_CHANGED
             }
+
+            if (oldItem.isSelected != newItem.isSelected) {
+                payload = payload or SELECTION_CHANGED
+            }
             return payload
         }
 
     }) {
 
-    val EDITABLE = 1
-    val NORMAL = 0
 
     override fun onBindViewHolder(p0: CurrencyViewHolder, p1: Int) {
     }
 
-    override fun getItemViewType(position: Int): Int =
-        if (getItem(position).isSelected)
-            EDITABLE
-        else
-            NORMAL
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.currency_item, parent, false)
-        return when(viewType){
-            EDITABLE -> EditableCurrencyViewHolder(itemView, onCurrencyChnaged)
-            else -> NormalCurrencyViewHolder(itemView, onCurrencySelected)
-        }
+        return CurrencyViewHolder(itemView, onCurrencySelected, onCurrencyChanged)
     }
-
 
     override fun onBindViewHolder(viewHolder: CurrencyViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.isNullOrEmpty()) {
             viewHolder.setCurrencyOnly(getItem(position))
             viewHolder.setAmountOnly(getItem(position))
+            viewHolder.setIsSelectedOnly(getItem(position).isSelected)
         } else {
             for (payload in payloads){
                 if (payload is Int){
@@ -77,6 +69,10 @@ class CurrenciesAdapter (val onCurrencySelected:(CurrencyViewModel)->Unit,
                     if (payload and AMOUNT_CHANGED == AMOUNT_CHANGED){
                         viewHolder.setAmountOnly(getItem(position))
                     }
+
+                    if (payload and SELECTION_CHANGED == SELECTION_CHANGED){
+                        viewHolder.setIsSelectedOnly(getItem(position).isSelected)
+                    }
                 }
             }
         }
@@ -84,73 +80,74 @@ class CurrenciesAdapter (val onCurrencySelected:(CurrencyViewModel)->Unit,
     }
 
     companion object {
-        val CURRENCY_CHANGED = 1 shl 0;
-        val AMOUNT_CHANGED = 1 shl 1;
+        val CURRENCY_CHANGED = 1 shl 0
+        val AMOUNT_CHANGED = 1 shl 1
+        val SELECTION_CHANGED = 1 shl 2
     }
 
 }
 
-class NormalCurrencyViewHolder(itemView: View,
-                         val onCurrencySelected:(CurrencyViewModel)->Unit)
-    : CurrencyViewHolder(itemView) {
 
-    init {
-        itemView.setOnClickListener {
-            if (currencyViewModel != null) onCurrencySelected(currencyViewModel!!)
-        }
-
-        editText.setOnFocusChangeListener { v, hasFocus ->
-            if (currencyViewModel != null && hasFocus)
-                onCurrencySelected(currencyViewModel!!)
-            v.clearFocus()
-        }
-
-    }
-}
-
-sealed class CurrencyViewHolder(itemView: View)
+class CurrencyViewHolder(itemView: View,
+                                val onCurrencySelected:(CurrencyViewModel)->Unit,
+                                val onCurrencyChanged:(CurrencyViewModel)->Unit)
     : RecyclerView.ViewHolder(itemView) {
 
     protected val idTextView : TextView = itemView.findViewById(R.id.id_tv)
     protected val editText : EditText = itemView.findViewById(R.id.value_edt)
 
-    fun setCurrencyOnly(currency: CurrencyViewModel) {
-        idTextView.text = currency.currency.id
-    }
+    private var isTextSetsProgramatically = false;
 
-    open fun setAmountOnly(currency: CurrencyViewModel) {
-        editText.setText(currency.amount.toDecimalString())
-    }
+    val textWatcher = object : TextWatcher {
+        override fun afterTextChanged(s: Editable?) {}
 
-
-    var currencyViewModel:CurrencyViewModel? = null
-
-
-}
-
-class EditableCurrencyViewHolder(itemView: View,
-                         val onCurrencyChanged:(CurrencyViewModel)->Unit)
-    : CurrencyViewHolder(itemView) {
-
-    val textWatcher = object: TextWatcher {
-        override fun afterTextChanged(s: Editable?) { }
-
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            try {
-                val newAmount = java.lang.Double.parseDouble(s.toString())
+            if (!isTextSetsProgramatically) {
+                val newAmount = try {
+                    java.lang.Double.parseDouble(s.toString())
+                } catch (e: Exception) {
+                    0.0
+                }
                 currencyViewModel?.amount = newAmount
                 onCurrencyChanged(currencyViewModel!!)
-            } catch (e: Exception) {
             }
         }
     }
 
-    override fun setAmountOnly(currency: CurrencyViewModel) {
-        editText.removeTextChangedListener(textWatcher)
-        super.setAmountOnly(currency)
-        editText.addTextChangedListener(textWatcher)
+    fun setCurrencyOnly(currency: CurrencyViewModel) {
+        idTextView.text = currency.currency.id
     }
 
+
+    fun setAmountOnly(currency: CurrencyViewModel) {
+        isTextSetsProgramatically = true
+        editText.setTextKeepState(currency.amount.toDecimalString())
+        isTextSetsProgramatically = false
+    }
+
+    fun setIsSelectedOnly(selected: Boolean) {
+        if (selected) {
+            editText.addTextChangedListener(textWatcher)
+            itemView.setOnClickListener(null)
+            editText.setOnFocusChangeListener(null)
+            editText.requestFocus()
+            editText.setSelection(editText.text.length)
+        } else {
+            editText.removeTextChangedListener(textWatcher)
+            itemView.setOnClickListener {
+                if (currencyViewModel != null) onCurrencySelected(currencyViewModel!!)
+            }
+
+            editText.setOnFocusChangeListener { v, hasFocus ->
+                if (currencyViewModel != null) {
+                    if (hasFocus) onCurrencySelected(currencyViewModel!!)
+                }
+            }
+        }
+    }
+
+
+    var currencyViewModel:CurrencyViewModel? = null
 }

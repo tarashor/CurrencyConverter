@@ -6,31 +6,30 @@ import com.tarashor.currencyconverter.data.ICurrenciesRepository
 import java.math.RoundingMode
 import java.text.DecimalFormat
 
-class Currencies(val repository: ICurrenciesRepository) {
+class CurrenciesInteractor(val repository: ICurrenciesRepository) {
     private val BASE_CURRENCY_ID = "EUR"
 
-    val baseCurrency: Currency = Currency(BASE_CURRENCY_ID, 1.0, true)
+    val baseCurrency: Currency = Currency(BASE_CURRENCY_ID)
 
-    val currencies = MutableLiveData<List<Currency>>()
-
-    fun reloadCurrencies(){
+    fun reloadCurrencies(onLoaded: (Map<Currency, Double>) -> Unit){
         repository.isCacheDirty = true
         repository.getCurrencies(baseCurrency) {
-            currencies.value = convertToModel(it)
+            onLoaded(convertToModel(it))
         }
     }
 
-    private fun convertToModel(dao: CurrenciesDAO?): List<Currency> {
-        val items = ArrayList<Currency>()
+
+
+    private fun convertToModel(dao: CurrenciesDAO?): Map<Currency, Double> {
+        val items = mutableMapOf<Currency, Double>()
         if (dao != null){
             dao.rates.forEach{
-                items.add(Currency(it.key, it.value))
+                items.put(Currency(it.key), it.value)
             }
-            items.add(baseCurrency)
+            items.put(baseCurrency, 1.0)
         }
-        return items.take(4)
+        return items
     }
-
 }
 
 fun Double.toDecimalString():String {

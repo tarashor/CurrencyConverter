@@ -2,7 +2,7 @@ package com.tarashor.currencyconverter.viewmodel
 
 import android.arch.lifecycle.*
 import com.tarashor.currencyconverter.data.ICurrenciesRepository
-import com.tarashor.currencyconverter.model.Currencies
+import com.tarashor.currencyconverter.model.CurrenciesInteractor
 import com.tarashor.currencyconverter.model.Currency
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
@@ -10,43 +10,37 @@ import java.util.concurrent.TimeUnit
 
 
 class CurrencyConverterViewModel(repository: ICurrenciesRepository) : ViewModel() {
-    val items = MediatorLiveData<CurrenciesAdapterModel>()
+    val items = MutableLiveData<List<CurrencyViewModel>>()
 
-    private val model = Currencies(repository)
+    private val interactor = CurrenciesInteractor(repository)
+    private val model = CurrenciesAdapterModel(interactor.baseCurrency, 100.0)
 
     private val scheduler = Executors.newSingleThreadScheduledExecutor()
+    private lateinit var scheduledFuture: ScheduledFuture<*>
 
     init {
-        items.value = CurrenciesAdapterModel(model.baseCurrency, 100.0, emptyList())
+        items.value = model.build()
+    }
 
-        items.addSource(model.currencies) {
-            items.value?.values = it
-            items.value = items.value
-        }
+    private fun updateAvailableCurrencies(it: Map<Currency, Double>) {
+        model.setCurrencies(it)
+        items.value = model.build()
     }
 
     fun updateAmount(amount : Double){
-        //stopPollingCurrencyRates()
-        items.value?.enteredAmount = amount
-        items.value = items.value
-        //startPollingCurrencyRates()
+        model.setAmount(amount)
+        items.value = model.build()
     }
 
     fun updateSelectedCurrency(currency: CurrencyViewModel){
-        //stopPollingCurrencyRates()
-        items.value?.selectedCurrency = currency.currency
-        items.value?.enteredAmount = currency.amount
-        items.value = items.value
-        //startPollingCurrencyRates()
+        model.setSelectedCurrency(currency.currency, currency.amount)
+        items.value = model.build()
     }
-
-
-    private lateinit var scheduledFuture: ScheduledFuture<*>
 
     fun startPollingCurrencyRates() {
         scheduledFuture = scheduler.scheduleAtFixedRate(Runnable {
-            model.reloadCurrencies()
-        }, 0, 30, TimeUnit.SECONDS)
+            interactor.reloadCurrencies(::updateAvailableCurrencies)
+        }, 0, 1, TimeUnit.SECONDS)
     }
 
     fun stopPollingCurrencyRates() {
@@ -54,40 +48,19 @@ class CurrencyConverterViewModel(repository: ICurrenciesRepository) : ViewModel(
     }
 }
 
-class CurrenciesAdapterModel(
-    var selectedCurrency:Currency,
-    var enteredAmount: Double,
-    var values: List<Currency>?
-    ){
-    fun build() : List<CurrencyViewModel> {
-        val models = mutableListOf<CurrencyViewModel>()
-
-        models.add(CurrencyViewModel(selectedCurrency, enteredAmount, true))
-
-        val filteredViewModels = values?.filter { it != selectedCurrency }
-            ?.map {
-                CurrencyViewModel(
-                    it, it.convertAmountToOtherCurrency(enteredAmount, selectedCurrency),
-                    false
-                )
-            }?.sorted()
-
-        if (filteredViewModels != null) models.addAll(filteredViewModels)
-
-        return models
-    }
-}
-
-
 
 class CurrencyViewModel(
     val currency: Currency,
     var amount: Double = 0.0,
-    var isSelected: Boolean = false
+    var isSelected: Boolean = false,
+    var historyOrder: Int = -1
 ) : Comparable<CurrencyViewModel> {
-    override fun compareTo(other: CurrencyViewModel): Int = if (isSelected && !other.isSelected) 1
-    else if (!isSelected && other.isSelected) -1
-    else currency.compareTo(currency)
+
+    override fun compareTo(other: CurrencyViewModel): Int = if (isSelected && !other.isSelected) -1
+    else if (!isSelected && other.isSelected) 1
+    else if (historyOrder == -1 && other.historyOrder == -1) currency.compareTo(other.currency)
+    else -historyOrder.compareTo(other.historyOrder)
+
 
     override fun toString(): String {
         return "$currency - $amount"

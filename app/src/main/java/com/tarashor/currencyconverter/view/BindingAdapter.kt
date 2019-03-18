@@ -9,9 +9,9 @@ object BindingAdapter {
 
     @JvmStatic
     @BindingAdapter("items")
-    fun setSearchItems(recyclerView: RecyclerView, items: CurrenciesAdapterModel?) {
+    fun setSearchItems(recyclerView: RecyclerView, items: List<CurrencyViewModel>?) {
         if (recyclerView.adapter is CurrenciesAdapter) {
-            (recyclerView.adapter as CurrenciesAdapter).submitList(items?.build())
+            (recyclerView.adapter as CurrenciesAdapter).submitList(items)
         }
     }
 }
