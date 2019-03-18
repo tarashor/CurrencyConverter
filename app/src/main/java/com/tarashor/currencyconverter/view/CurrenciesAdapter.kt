@@ -11,24 +11,25 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import com.tarashor.currencyconverter.R
-import com.tarashor.currencyconverter.model.toDecimalString
-import com.tarashor.currencyconverter.viewmodel.CurrencyViewModel
+import com.tarashor.currencyconverter.viewmodel.CurrencyViewModelItem
 import java.lang.Exception
 
-class CurrenciesAdapter (val onCurrencySelected:(CurrencyViewModel)->Unit,
-                         val onCurrencyChanged:(CurrencyViewModel)->Unit) :
-    ListAdapter<CurrencyViewModel, CurrencyViewHolder>(object: DiffUtil.ItemCallback<CurrencyViewModel>(){
-        override fun areItemsTheSame(p0: CurrencyViewModel, p1: CurrencyViewModel): Boolean {
+class CurrenciesAdapter (
+    private val onCurrencySelected:(CurrencyViewModelItem)->Unit,
+    private val onCurrencyChanged:(CurrencyViewModelItem)->Unit) :
+
+    ListAdapter<CurrencyViewModelItem, CurrencyViewHolder>(object: DiffUtil.ItemCallback<CurrencyViewModelItem>(){
+        override fun areItemsTheSame(p0: CurrencyViewModelItem, p1: CurrencyViewModelItem): Boolean {
             return p0.currency.compareTo(p1.currency) == 0
         }
 
-        override fun areContentsTheSame(p0: CurrencyViewModel, p1: CurrencyViewModel): Boolean {
+        override fun areContentsTheSame(p0: CurrencyViewModelItem, p1: CurrencyViewModelItem): Boolean {
             return p0.currency.compareTo(p1.currency) == 0
                     && p0.amount == p1.amount
                     && p0.isSelected == p1.isSelected
         }
 
-        override fun getChangePayload(oldItem: CurrencyViewModel, newItem: CurrencyViewModel): Any? {
+        override fun getChangePayload(oldItem: CurrencyViewModelItem, newItem: CurrencyViewModelItem): Any? {
             var payload = 0
             if (oldItem.currency.compareTo(newItem.currency) != 0) {
                 payload = payload or CURRENCY_CHANGED
@@ -89,8 +90,8 @@ class CurrenciesAdapter (val onCurrencySelected:(CurrencyViewModel)->Unit,
 
 
 class CurrencyViewHolder(itemView: View,
-                                val onCurrencySelected:(CurrencyViewModel)->Unit,
-                                val onCurrencyChanged:(CurrencyViewModel)->Unit)
+                         val onCurrencySelected:(CurrencyViewModelItem)->Unit,
+                         val onCurrencyChanged:(CurrencyViewModelItem)->Unit)
     : RecyclerView.ViewHolder(itemView) {
 
     protected val idTextView : TextView = itemView.findViewById(R.id.id_tv)
@@ -106,24 +107,23 @@ class CurrencyViewHolder(itemView: View,
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             if (!isTextSetsProgramatically) {
                 val newAmount = try {
-                    java.lang.Double.parseDouble(s.toString())
+                    currencyViewModel?.parseAmount(s.toString())
                 } catch (e: Exception) {
-                    0.0
+                    currencyViewModel?.amount = 0.0
                 }
-                currencyViewModel?.amount = newAmount
                 onCurrencyChanged(currencyViewModel!!)
             }
         }
     }
 
-    fun setCurrencyOnly(currency: CurrencyViewModel) {
+    fun setCurrencyOnly(currency: CurrencyViewModelItem) {
         idTextView.text = currency.currency.id
     }
 
 
-    fun setAmountOnly(currency: CurrencyViewModel) {
+    fun setAmountOnly(currency: CurrencyViewModelItem) {
         isTextSetsProgramatically = true
-        editText.setTextKeepState(currency.amount.toDecimalString())
+        editText.setTextKeepState(currency.formattedAmount())
         isTextSetsProgramatically = false
     }
 
@@ -132,12 +132,14 @@ class CurrencyViewHolder(itemView: View,
             editText.addTextChangedListener(textWatcher)
             itemView.setOnClickListener(null)
             editText.setOnFocusChangeListener(null)
-            editText.requestFocus()
-            editText.setSelection(editText.text.length)
         } else {
             editText.removeTextChangedListener(textWatcher)
             itemView.setOnClickListener {
-                if (currencyViewModel != null) onCurrencySelected(currencyViewModel!!)
+                if (currencyViewModel != null){
+                    editText.requestFocus()
+                    editText.setSelection(editText.text.length)
+                    //onCurrencySelected(currencyViewModel!!)
+                }
             }
 
             editText.setOnFocusChangeListener { v, hasFocus ->
@@ -149,5 +151,5 @@ class CurrencyViewHolder(itemView: View,
     }
 
 
-    var currencyViewModel:CurrencyViewModel? = null
+    var currencyViewModel:CurrencyViewModelItem? = null
 }

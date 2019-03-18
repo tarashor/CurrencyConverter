@@ -1,39 +1,48 @@
 package com.tarashor.currencyconverter.model
 
-import android.arch.lifecycle.MutableLiveData
 import com.tarashor.currencyconverter.data.CurrenciesDAO
 import com.tarashor.currencyconverter.data.ICurrenciesRepository
-import java.math.RoundingMode
-import java.text.DecimalFormat
+
 
 class CurrenciesInteractor(val repository: ICurrenciesRepository) {
     private val BASE_CURRENCY_ID = "EUR"
 
-    val baseCurrency: Currency = Currency(BASE_CURRENCY_ID)
+    lateinit var baseCurrency: Currency
+    val currenciesRates = hashMapOf<Currency, Double>()
 
-    fun reloadCurrencies(onLoaded: (Map<Currency, Double>) -> Unit){
-        repository.isCacheDirty = true
-        repository.getCurrencies(baseCurrency) {
-            onLoaded(convertToModel(it))
-        }
-    }
-
-
-
-    private fun convertToModel(dao: CurrenciesDAO?): Map<Currency, Double> {
-        val items = mutableMapOf<Currency, Double>()
-        if (dao != null){
-            dao.rates.forEach{
-                items.put(Currency(it.key), it.value)
+    fun convertAmountToOtherCurrency(
+        amount: Double,
+        selectedCurrency: Currency?,
+        currencyOut: Currency?
+    ) : Double{
+        return if (this::baseCurrency.isInitialized){
+            if (selectedCurrency == baseCurrency){
+                amount  * (currenciesRates[currencyOut]?:1.0)
+            } else {
+                amount / (currenciesRates[selectedCurrency]?:1.0) * (this.currenciesRates[currencyOut]?:1.0)
             }
-            items.put(baseCurrency, 1.0)
+        } else {
+            amount
         }
-        return items
+    }
+
+    fun reloadCurrencies(onLoaded: () -> Unit, newBaseCurrency: Currency? = null){
+        repository.isCacheDirty = true
+        repository.getCurrencies(newBaseCurrency) {
+            setCurrenciesRates(it)
+            onLoaded()
+        }
+    }
+
+    private fun setCurrenciesRates(dao: CurrenciesDAO?) {
+        currenciesRates.clear()
+        dao?.rates?.forEach {
+            currenciesRates[Currency(it.key)] = it.value
+        }
+        dao?.let {
+            baseCurrency = Currency(it.base)
+            currenciesRates[baseCurrency] = 1.0
+        }
     }
 }
 
-fun Double.toDecimalString():String {
-    val df = DecimalFormat("#.##")
-    df.roundingMode = RoundingMode.CEILING
-    return df.format(this)
-}

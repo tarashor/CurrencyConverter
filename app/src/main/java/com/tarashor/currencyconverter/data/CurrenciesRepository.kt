@@ -7,11 +7,12 @@ interface ICurrenciesRepository : ICurrenciesDataSource{
 }
 
 class CurrenciesRepository(val remoteDataSource: ICurrenciesDataSource) : ICurrenciesRepository{
-    override fun getCurrencies(baseCurrency: Currency, callback: (CurrenciesDAO?) -> Unit) {
+    override fun getCurrencies(baseCurrency: Currency?, callback: (CurrenciesDAO?) -> Unit) {
         if (isCacheDirty){
             remoteDataSource.getCurrencies(baseCurrency, callback)
         }
     }
+
 
     override var isCacheDirty: Boolean = true
 

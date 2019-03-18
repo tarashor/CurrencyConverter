@@ -11,8 +11,8 @@ import retrofit2.Retrofit
 import retrofit2.http.Query
 
 class CurrenciesRetrofitRemoteDataSource : ICurrenciesDataSource{
-    override fun getCurrencies(baseCurrency: Currency, callback: (CurrenciesDAO?) -> Unit) {
-        service.getCurrencies(baseCurrency.id)
+    override fun getCurrencies(baseCurrency: Currency?, callback: (CurrenciesDAO?) -> Unit) {
+        service.getCurrencies(baseCurrency?.id)
             .enqueue(object : Callback<CurrenciesDAO> {
                 override fun onResponse(call: Call<CurrenciesDAO>, response: Response<CurrenciesDAO>) {
                     callback(response.body())
@@ -39,5 +39,5 @@ class CurrenciesRetrofitRemoteDataSource : ICurrenciesDataSource{
 
 interface APIRequest {
     @GET("latest")
-    fun getCurrencies(@Query("baseCurrency") baseCurrency: String): Call<CurrenciesDAO>
+    fun getCurrencies(@Query("base") baseCurrency: String?): Call<CurrenciesDAO>
 }
