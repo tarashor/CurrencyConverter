@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit
 
 
 class CurrencyConverterViewModel(repository: ICurrenciesRepository) : ViewModel() {
+
     val items = MutableLiveData<List<CurrencyViewModelItem>>()
 
     private val model = CurrenciesUIModel(repository)
@@ -43,11 +44,15 @@ class CurrencyConverterViewModel(repository: ICurrenciesRepository) : ViewModel(
             model.reloadRates{
                 notifyModelChanged()
             }
-        }, 0, 60, TimeUnit.SECONDS)
+        }, 0, UPDATE_INTERVAL_SECONDS, TimeUnit.SECONDS)
     }
 
     fun stopPollingCurrencyRates() {
         scheduledFuture.cancel(true)
+    }
+
+    companion object {
+        private val UPDATE_INTERVAL_SECONDS = 1L
     }
 }
 
@@ -69,14 +74,4 @@ class CurrencyViewModelItem(
         return "$currency - $amount"
     }
 
-    private val df: DecimalFormat = DecimalFormat("#.##")
-
-    fun formattedAmount():String {
-        df.roundingMode = RoundingMode.CEILING
-        return df.format(amount)
-    }
-
-    fun parseAmount(str: String){
-        amount = df.parse(str).toDouble()
-    }
 }

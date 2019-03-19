@@ -13,6 +13,8 @@ import android.widget.TextView
 import com.tarashor.currencyconverter.R
 import com.tarashor.currencyconverter.viewmodel.CurrencyViewModelItem
 import java.lang.Exception
+import java.math.RoundingMode
+import java.text.DecimalFormat
 
 class CurrenciesAdapter (
     private val onCurrencySelected:(CurrencyViewModelItem)->Unit,
@@ -62,16 +64,16 @@ class CurrenciesAdapter (
             viewHolder.setAmountOnly(getItem(position))
             viewHolder.setIsSelectedOnly(getItem(position).isSelected)
         } else {
-            for (payload in payloads){
-                if (payload is Int){
-                    if (payload and CURRENCY_CHANGED == CURRENCY_CHANGED){
+            for (payload in payloads) {
+                if (payload is Int) {
+                    if (payload and CURRENCY_CHANGED == CURRENCY_CHANGED) {
                         viewHolder.setCurrencyOnly(getItem(position))
                     }
-                    if (payload and AMOUNT_CHANGED == AMOUNT_CHANGED){
+                    if (payload and AMOUNT_CHANGED == AMOUNT_CHANGED) {
                         viewHolder.setAmountOnly(getItem(position))
                     }
 
-                    if (payload and SELECTION_CHANGED == SELECTION_CHANGED){
+                    if (payload and SELECTION_CHANGED == SELECTION_CHANGED) {
                         viewHolder.setIsSelectedOnly(getItem(position).isSelected)
                     }
                 }
@@ -80,12 +82,34 @@ class CurrenciesAdapter (
         viewHolder.currencyViewModel = getItem(position)
     }
 
+    override fun onViewAttachedToWindow(holder: CurrencyViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        holder.willBeShown()
+    }
+
+    override fun onViewDetachedFromWindow(holder: CurrencyViewHolder) {
+        super.onViewDetachedFromWindow(holder)
+        holder.willBeHidden()
+    }
+
     companion object {
         val CURRENCY_CHANGED = 1 shl 0
         val AMOUNT_CHANGED = 1 shl 1
         val SELECTION_CHANGED = 1 shl 2
-    }
 
+        private val df: DecimalFormat = DecimalFormat("#.##")
+
+        fun formatAmount(amount: Double): String {
+            df.roundingMode = RoundingMode.CEILING
+            return df.format(amount)
+        }
+
+        fun parseAmount(str: String) = try {
+            df.parse(str).toDouble()
+        } catch (e: Exception) {
+            0.0
+        }
+    }
 }
 
 
@@ -106,11 +130,7 @@ class CurrencyViewHolder(itemView: View,
 
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             if (!isTextSetsProgramatically) {
-                val newAmount = try {
-                    currencyViewModel?.parseAmount(s.toString())
-                } catch (e: Exception) {
-                    currencyViewModel?.amount = 0.0
-                }
+                currencyViewModel?.amount = CurrenciesAdapter.parseAmount(s.toString())
                 onCurrencyChanged(currencyViewModel!!)
             }
         }
@@ -123,7 +143,7 @@ class CurrencyViewHolder(itemView: View,
 
     fun setAmountOnly(currency: CurrencyViewModelItem) {
         isTextSetsProgramatically = true
-        editText.setTextKeepState(currency.formattedAmount())
+        editText.setTextKeepState(CurrenciesAdapter.formatAmount(currency.amount))
         isTextSetsProgramatically = false
     }
 
@@ -138,7 +158,6 @@ class CurrencyViewHolder(itemView: View,
                 if (currencyViewModel != null){
                     editText.requestFocus()
                     editText.setSelection(editText.text.length)
-                    //onCurrencySelected(currencyViewModel!!)
                 }
             }
 
@@ -150,6 +169,17 @@ class CurrencyViewHolder(itemView: View,
         }
     }
 
+    fun willBeShown() {
+        currencyViewModel?.let{
+            if (it.isSelected) editText.requestFocus()
+        }
+    }
+
+    fun willBeHidden() {
+        editText.clearFocus()
+    }
+
 
     var currencyViewModel:CurrencyViewModelItem? = null
 }
+
