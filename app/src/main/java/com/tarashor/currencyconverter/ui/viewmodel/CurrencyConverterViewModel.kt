@@ -1,18 +1,19 @@
-package com.tarashor.currencyconverter.viewmodel
+package com.tarashor.currencyconverter.ui.viewmodel
 
 import android.arch.lifecycle.*
-import com.tarashor.currencyconverter.data.ICurrenciesRepository
-import com.tarashor.currencyconverter.model.CurrenciesUIModel
+import com.tarashor.currencyconverter.data.CurrenciesRepository
+import com.tarashor.currencyconverter.domain.CurrenciesUIModel
+import com.tarashor.currencyconverter.domain.ICurrenciesInteractor
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
 
-class CurrencyConverterViewModel(repository: ICurrenciesRepository) : ViewModel() {
+class CurrencyConverterViewModel(private val interactor: ICurrenciesInteractor) : ViewModel() {
 
     val items = MutableLiveData<List<CurrencyViewModelItem>>()
 
-    private val model = CurrenciesUIModel(repository)
+    private val model = CurrenciesUIModel(interactor)
 
     private val scheduler = Executors.newSingleThreadScheduledExecutor()
     private lateinit var scheduledFuture: ScheduledFuture<*>

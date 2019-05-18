@@ -1,4 +1,4 @@
-package com.tarashor.currencyconverter.view
+package com.tarashor.currencyconverter.ui.view
 
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
@@ -7,7 +7,7 @@ import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import com.tarashor.currencyconverter.R
-import com.tarashor.currencyconverter.viewmodel.CurrencyViewModelItem
+import com.tarashor.currencyconverter.ui.viewmodel.CurrencyViewModelItem
 
 class CurrencyViewHolder(itemView: View,
                          val onCurrencySelected:(CurrencyViewModelItem)->Unit,

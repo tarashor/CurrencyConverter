@@ -1,11 +1,11 @@
-package com.tarashor.currencyconverter.view
+package com.tarashor.currencyconverter.ui.view
 
 import android.support.v7.recyclerview.extensions.ListAdapter
 import android.support.v7.util.DiffUtil
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.tarashor.currencyconverter.R
-import com.tarashor.currencyconverter.viewmodel.CurrencyViewModelItem
+import com.tarashor.currencyconverter.ui.viewmodel.CurrencyViewModelItem
 import java.lang.Exception
 import java.math.RoundingMode
 import java.text.DecimalFormat

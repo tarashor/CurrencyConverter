@@ -1,11 +1,10 @@
-package com.tarashor.currencyconverter.model
+package com.tarashor.currencyconverter.domain
 
 import com.tarashor.currencyconverter.data.ICurrenciesRepository
-import com.tarashor.currencyconverter.viewmodel.CurrencyViewModelItem
+import com.tarashor.currencyconverter.ui.viewmodel.CurrencyViewModelItem
 
-class CurrenciesUIModel(repository: ICurrenciesRepository) {
+class CurrenciesUIModel(private val interactor: ICurrenciesInteractor) {
 
-    private val interactor = CurrenciesInteractor(repository)
 
     private var selectedCurrency: String? = null
     private var enteredAmount: Double = 100.0

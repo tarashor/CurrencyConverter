@@ -1,12 +1,14 @@
-package com.tarashor.currencyconverter.view
+package com.tarashor.currencyconverter.ui.viewmodel
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
-import com.tarashor.currencyconverter.data.CurrenciesDummyDataSource
 import com.tarashor.currencyconverter.data.CurrenciesRepository
 import com.tarashor.currencyconverter.data.CurrenciesRetrofitRemoteDataSource
 import com.tarashor.currencyconverter.data.ICurrenciesRepository
-import com.tarashor.currencyconverter.viewmodel.CurrencyConverterViewModel
+import com.tarashor.currencyconverter.di.CurrencyComponent
+import com.tarashor.currencyconverter.di.DaggerCurrencyComponent
+import com.tarashor.currencyconverter.domain.CurrenciesInteractor
+import com.tarashor.currencyconverter.domain.ICurrenciesInteractor
 import java.lang.reflect.InvocationTargetException
 
 class ViewModelFactory : ViewModelProvider.Factory {
@@ -14,7 +16,7 @@ class ViewModelFactory : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (CurrencyConverterViewModel::class.java.isAssignableFrom(modelClass)) {
             try {
-                return modelClass.getConstructor(ICurrenciesRepository::class.java).newInstance(createCurrencyRepository())
+                return modelClass.getConstructor(ICurrenciesInteractor::class.java).newInstance(createCurrencyInteractor())
             } catch (e: IllegalAccessException) {
                 throw RuntimeException("Cannot create an instance of $modelClass", e)
             } catch (e: InstantiationException) {
@@ -27,8 +29,8 @@ class ViewModelFactory : ViewModelProvider.Factory {
         throw RuntimeException("Cannot create an instance of $modelClass")
     }
 
-    private fun createCurrencyRepository(): ICurrenciesRepository {
-        return CurrenciesRepository(CurrenciesRetrofitRemoteDataSource())
+    private fun createCurrencyInteractor(): ICurrenciesInteractor {
+        return DaggerCurrencyComponent.create().interactor
     }
 
 }

@@ -7,7 +7,7 @@
         <import type="android.view.View"/>
 
         <variable name="viewModel"
-                  type="com.tarashor.currencyconverter.viewmodel.CurrencyConverterViewModel"/>
+                  type="com.tarashor.currencyconverter.ui.viewmodel.CurrencyConverterViewModel"/>
     </data>
     <android.support.v7.widget.RecyclerView
             android:id="@+id/currencies_list"

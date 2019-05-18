@@ -1,16 +1,16 @@
-package com.tarashor.currencyconverter.model
+package com.tarashor.currencyconverter.domain
 
 import com.tarashor.currencyconverter.entry.CurrenciesDTO
 import com.tarashor.currencyconverter.data.ICurrenciesRepository
 
 
-class CurrenciesInteractor(val repository: ICurrenciesRepository) {
+class CurrenciesInteractor(val repository: ICurrenciesRepository) : ICurrenciesInteractor {
     private val BASE_CURRENCY_ID = "EUR"
 
-    lateinit var baseCurrency: String
-    val currenciesRates = hashMapOf<String, Double>()
+    override lateinit var baseCurrency: String
+    override val currenciesRates = hashMapOf<String, Double>()
 
-    fun convertAmountToOtherCurrency(
+    override fun convertAmountToOtherCurrency(
         amount: Double,
         selectedCurrency: String?,
         currencyOut: String?
@@ -26,14 +26,14 @@ class CurrenciesInteractor(val repository: ICurrenciesRepository) {
         }
     }
 
-    fun reloadCurrencies(onLoaded: () -> Unit, newBaseCurrency: String? = null){
+    override fun reloadCurrencies(onLoaded: () -> Unit, newBaseCurrency: String?){
         repository.getCurrencies(newBaseCurrency) {
             setCurrenciesRates(it)
             onLoaded()
         }
     }
 
-    private fun setCurrenciesRates(DTO: CurrenciesDTO?) {
+    override fun setCurrenciesRates(DTO: CurrenciesDTO?) {
         currenciesRates.clear()
         DTO?.rates?.forEach {
             currenciesRates[it.key] = it.value

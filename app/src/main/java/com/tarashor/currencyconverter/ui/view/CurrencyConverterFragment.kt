@@ -1,16 +1,16 @@
-package com.tarashor.currencyconverter.view
+package com.tarashor.currencyconverter.ui.view
 
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.tarashor.currencyconverter.databinding.CurrencyConverterFragmentBinding
 
-import com.tarashor.currencyconverter.viewmodel.CurrencyConverterViewModel
+import com.tarashor.currencyconverter.ui.viewmodel.CurrencyConverterViewModel
+import com.tarashor.currencyconverter.ui.viewmodel.ViewModelFactory
 
 class CurrencyConverterFragment : Fragment() {
 
