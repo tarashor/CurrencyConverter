@@ -2,6 +2,7 @@ package com.tarashor.currencyconverter.view
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
+import com.tarashor.currencyconverter.data.CurrenciesDummyDataSource
 import com.tarashor.currencyconverter.data.CurrenciesRepository
 import com.tarashor.currencyconverter.data.CurrenciesRetrofitRemoteDataSource
 import com.tarashor.currencyconverter.data.ICurrenciesRepository

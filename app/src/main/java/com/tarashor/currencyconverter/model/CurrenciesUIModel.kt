@@ -7,9 +7,9 @@ class CurrenciesUIModel(repository: ICurrenciesRepository) {
 
     private val interactor = CurrenciesInteractor(repository)
 
-    private var selectedCurrency: Currency? = null
+    private var selectedCurrency: String? = null
     private var enteredAmount: Double = 100.0
-    private val history: MutableMap<Currency, Long> = hashMapOf()
+    private val history: MutableMap<String, Long> = hashMapOf()
 
     private var currentHistoryIndex: Long = 0
 
@@ -17,7 +17,7 @@ class CurrenciesUIModel(repository: ICurrenciesRepository) {
         enteredAmount = amount
     }
 
-    fun setSelectedCurrency(currency: Currency, amount: Double) {
+    fun setSelectedCurrency(currency: String, amount: Double) {
         history.remove(currency)
         selectedCurrency?.run {
             history[this] = currentHistoryIndex

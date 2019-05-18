@@ -3,10 +3,6 @@ package com.tarashor.currencyconverter.viewmodel
 import android.arch.lifecycle.*
 import com.tarashor.currencyconverter.data.ICurrenciesRepository
 import com.tarashor.currencyconverter.model.CurrenciesUIModel
-import com.tarashor.currencyconverter.model.CurrenciesInteractor
-import com.tarashor.currencyconverter.model.Currency
-import java.math.RoundingMode
-import java.text.DecimalFormat
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
@@ -58,7 +54,7 @@ class CurrencyConverterViewModel(repository: ICurrenciesRepository) : ViewModel(
 
 
 class CurrencyViewModelItem(
-    val currency: Currency,
+    val currency: String,
     var amount: Double = 0.0,
     var isSelected: Boolean = false,
     var historyOrder: Long = -1L

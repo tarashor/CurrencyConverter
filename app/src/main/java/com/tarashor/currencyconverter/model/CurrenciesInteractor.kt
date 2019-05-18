@@ -1,19 +1,19 @@
 package com.tarashor.currencyconverter.model
 
-import com.tarashor.currencyconverter.data.CurrenciesDAO
+import com.tarashor.currencyconverter.entry.CurrenciesDTO
 import com.tarashor.currencyconverter.data.ICurrenciesRepository
 
 
 class CurrenciesInteractor(val repository: ICurrenciesRepository) {
     private val BASE_CURRENCY_ID = "EUR"
 
-    lateinit var baseCurrency: Currency
-    val currenciesRates = hashMapOf<Currency, Double>()
+    lateinit var baseCurrency: String
+    val currenciesRates = hashMapOf<String, Double>()
 
     fun convertAmountToOtherCurrency(
         amount: Double,
-        selectedCurrency: Currency?,
-        currencyOut: Currency?
+        selectedCurrency: String?,
+        currencyOut: String?
     ) : Double{
         return if (this::baseCurrency.isInitialized){
             if (selectedCurrency == baseCurrency){
@@ -26,22 +26,21 @@ class CurrenciesInteractor(val repository: ICurrenciesRepository) {
         }
     }
 
-    fun reloadCurrencies(onLoaded: () -> Unit, newBaseCurrency: Currency? = null){
-        repository.isCacheDirty = true
+    fun reloadCurrencies(onLoaded: () -> Unit, newBaseCurrency: String? = null){
         repository.getCurrencies(newBaseCurrency) {
             setCurrenciesRates(it)
             onLoaded()
         }
     }
 
-    private fun setCurrenciesRates(dao: CurrenciesDAO?) {
+    private fun setCurrenciesRates(DTO: CurrenciesDTO?) {
         currenciesRates.clear()
-        dao?.rates?.forEach {
-            currenciesRates[Currency(it.key)] = it.value
+        DTO?.rates?.forEach {
+            currenciesRates[it.key] = it.value
         }
-        dao?.let {
-            baseCurrency = Currency(it.base)
-            currenciesRates[baseCurrency] = 1.0
+        DTO?.let {
+            baseCurrency = it.base
+            currenciesRates[it.base] = 1.0
         }
     }
 }

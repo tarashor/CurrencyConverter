@@ -2,6 +2,6 @@ package com.tarashor.currencyconverter.data
 
 import com.tarashor.currencyconverter.entry.CurrenciesDTO
 
-interface ICurrenciesDataSource {
+interface ICurrenciesRepository {
     fun getCurrencies(baseCurrency: String?, callback: (CurrenciesDTO?) -> Unit)
 }
