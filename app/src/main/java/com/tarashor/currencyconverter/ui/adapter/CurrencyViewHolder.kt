@@ -1,4 +1,4 @@
-package com.tarashor.currencyconverter.ui.view
+package com.tarashor.currencyconverter.ui.adapter
 
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
@@ -40,7 +40,11 @@ class CurrencyViewHolder(itemView: View,
 
     fun setAmountOnly(currency: CurrencyViewModelItem) {
         isTextSetsProgramatically = true
-        editText.setTextKeepState(CurrenciesAdapter.formatAmount(currency.amount))
+        editText.setTextKeepState(
+            CurrenciesAdapter.formatAmount(
+                currency.amount
+            )
+        )
         isTextSetsProgramatically = false
     }
 

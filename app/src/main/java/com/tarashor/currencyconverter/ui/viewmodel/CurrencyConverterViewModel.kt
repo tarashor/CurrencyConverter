@@ -7,20 +7,18 @@ import com.tarashor.currencyconverter.domain.ICurrenciesInteractor
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 
-class CurrencyConverterViewModel(private val interactor: ICurrenciesInteractor) : ViewModel() {
+class CurrencyConverterViewModel : ViewModel() {
+    @Inject
+    lateinit var model : CurrenciesUIModel
 
     val items = MutableLiveData<List<CurrencyViewModelItem>>()
-
-    private val model = CurrenciesUIModel(interactor)
 
     private val scheduler = Executors.newSingleThreadScheduledExecutor()
     private lateinit var scheduledFuture: ScheduledFuture<*>
 
-    init {
-        items.value = model.build()
-    }
 
     private fun notifyModelChanged(){
         items.value = model.build()

@@ -2,6 +2,7 @@ package com.tarashor.currencyconverter.domain
 
 import com.tarashor.currencyconverter.entry.CurrenciesDTO
 import com.tarashor.currencyconverter.data.ICurrenciesRepository
+import javax.inject.Inject
 
 
 class CurrenciesInteractor(val repository: ICurrenciesRepository) : ICurrenciesInteractor {

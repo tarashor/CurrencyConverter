@@ -2,6 +2,7 @@ package com.tarashor.currencyconverter.ui.view
 
 import android.databinding.BindingAdapter
 import android.support.v7.widget.RecyclerView
+import com.tarashor.currencyconverter.ui.adapter.CurrenciesAdapter
 import com.tarashor.currencyconverter.ui.viewmodel.CurrencyViewModelItem
 
 object BindingAdapter {

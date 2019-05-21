@@ -1,4 +1,4 @@
-package com.tarashor.currencyconverter.ui.view
+package com.tarashor.currencyconverter.ui.adapter
 
 import android.support.v7.recyclerview.extensions.ListAdapter
 import android.support.v7.util.DiffUtil
@@ -49,7 +49,11 @@ class CurrenciesAdapter (
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.currency_item, parent, false)
-        return CurrencyViewHolder(itemView, onCurrencySelected, onCurrencyChanged)
+        return CurrencyViewHolder(
+            itemView,
+            onCurrencySelected,
+            onCurrencyChanged
+        )
     }
 
     override fun onBindViewHolder(viewHolder: CurrencyViewHolder, position: Int, payloads: MutableList<Any>) {

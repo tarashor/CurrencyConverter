@@ -5,7 +5,9 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class CurrenciesRetrofitRemoteDataSource(private val service: APIRequest) : ICurrenciesDataSource{
+class CurrenciesRetrofitRemoteDataSource(private val service: APIService)
+    : ICurrenciesDataSource {
+
     override fun getCurrencies(baseCurrency: String?, callback: (CurrenciesDTO?) -> Unit) {
         service.getCurrencies(baseCurrency)
             .enqueue(object : Callback<CurrenciesDTO> {

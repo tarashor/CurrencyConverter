@@ -1,9 +1,11 @@
 package com.tarashor.currencyconverter.domain
 
-import com.tarashor.currencyconverter.data.ICurrenciesRepository
 import com.tarashor.currencyconverter.ui.viewmodel.CurrencyViewModelItem
+import javax.inject.Inject
 
-class CurrenciesUIModel(private val interactor: ICurrenciesInteractor) {
+class CurrenciesUIModel
+@Inject
+constructor(private val interactor: ICurrenciesInteractor) {
 
 
     private var selectedCurrency: String? = null

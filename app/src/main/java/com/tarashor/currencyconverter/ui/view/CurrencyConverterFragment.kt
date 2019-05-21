@@ -9,8 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import com.tarashor.currencyconverter.databinding.CurrencyConverterFragmentBinding
 
+import com.tarashor.currencyconverter.ui.adapter.CurrenciesAdapter
+
 import com.tarashor.currencyconverter.ui.viewmodel.CurrencyConverterViewModel
-import com.tarashor.currencyconverter.ui.viewmodel.ViewModelFactory
 
 class CurrencyConverterFragment : Fragment() {
 
@@ -33,10 +34,10 @@ class CurrencyConverterFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.currenciesList.adapter = CurrenciesAdapter(
-            {currency ->
+            { currency ->
                 viewModel.updateSelectedCurrency(currency)
             },
-            {currency -> viewModel.updateAmount(currency.amount)})
+            { currency -> viewModel.updateAmount(currency.amount) })
 
         binding.currenciesList.preserveFocusAfterLayout = true
 
@@ -45,7 +46,8 @@ class CurrencyConverterFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this, ViewModelFactory()).get(CurrencyConverterViewModel::class.java)
+        viewModel = ViewModelProviders.of(this).get(CurrencyConverterViewModel::class.java)
+
         binding.viewModel = viewModel
     }
 
