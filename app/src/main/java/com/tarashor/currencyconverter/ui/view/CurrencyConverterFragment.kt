@@ -1,5 +1,6 @@
 package com.tarashor.currencyconverter.ui.view
 
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -12,12 +13,17 @@ import com.tarashor.currencyconverter.databinding.CurrencyConverterFragmentBindi
 import com.tarashor.currencyconverter.ui.adapter.CurrenciesAdapter
 
 import com.tarashor.currencyconverter.ui.viewmodel.CurrencyConverterViewModel
+import dagger.android.support.DaggerFragment
+import javax.inject.Inject
 
-class CurrencyConverterFragment : Fragment() {
+class CurrencyConverterFragment : DaggerFragment() {
 
     companion object {
         fun newInstance() = CurrencyConverterFragment()
     }
+
+    @Inject
+    lateinit var viewModelsFactory: ViewModelProvider.Factory
 
     private lateinit var viewModel: CurrencyConverterViewModel
     private lateinit var binding: CurrencyConverterFragmentBinding
@@ -46,7 +52,7 @@ class CurrencyConverterFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(CurrencyConverterViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, viewModelsFactory).get(CurrencyConverterViewModel::class.java)
 
         binding.viewModel = viewModel
     }

@@ -8,5 +8,5 @@ import java.lang.annotation.RetentionPolicy;
 @Scope
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Custom {
+public @interface ActivityScope {
 }

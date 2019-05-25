@@ -2,6 +2,7 @@ package com.tarashor.currencyconverter.ui.viewmodel
 
 import android.arch.lifecycle.*
 import com.tarashor.currencyconverter.data.CurrenciesRepository
+import com.tarashor.currencyconverter.di.ViewModelKey
 import com.tarashor.currencyconverter.domain.CurrenciesUIModel
 import com.tarashor.currencyconverter.domain.ICurrenciesInteractor
 import java.util.concurrent.Executors
@@ -9,10 +10,10 @@ import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-
-class CurrencyConverterViewModel : ViewModel() {
+class CurrencyConverterViewModel
     @Inject
-    lateinit var model : CurrenciesUIModel
+    constructor(private val model : CurrenciesUIModel)
+    : ViewModel() {
 
     val items = MutableLiveData<List<CurrencyViewModelItem>>()
 
