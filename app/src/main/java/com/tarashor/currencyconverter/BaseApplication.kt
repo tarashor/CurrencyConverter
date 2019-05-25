@@ -5,6 +5,7 @@ import android.app.Application
 import com.tarashor.currencyconverter.di.AppComponent
 import com.tarashor.currencyconverter.di.DaggerAppComponent
 import dagger.android.AndroidInjector
+import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import javax.inject.Inject
 
@@ -13,7 +14,7 @@ class BaseApplication : Application(), HasActivityInjector {
     private lateinit var appComponent: AppComponent
 
     @Inject
-    lateinit var activityInjector: AndroidInjector<Activity>
+    lateinit var activityInjector: DispatchingAndroidInjector<Activity>
 
 
     override fun onCreate() {

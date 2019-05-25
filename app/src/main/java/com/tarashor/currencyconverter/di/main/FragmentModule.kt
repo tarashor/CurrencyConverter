@@ -2,7 +2,7 @@ package com.tarashor.currencyconverter.di.main
 
 import android.arch.lifecycle.ViewModel
 import com.tarashor.currencyconverter.data.*
-import com.tarashor.currencyconverter.di.ActivityScope
+import com.tarashor.currencyconverter.di.FragmentScope
 import com.tarashor.currencyconverter.di.ViewModelKey
 import com.tarashor.currencyconverter.domain.CurrenciesInteractor
 import com.tarashor.currencyconverter.domain.ICurrenciesInteractor
@@ -11,39 +11,41 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import retrofit2.Retrofit
 
 @Module
 abstract class FragmentModule {
 
-    @ActivityScope
+
+    @FragmentScope
     @Binds
     @IntoMap
     @ViewModelKey(CurrencyConverterViewModel::class)
-    abstract fun bindReadingGoalWizardViewModel(viewModel: CurrencyConverterViewModel): ViewModel
+    abstract fun bindCurrencyConverterViewModel(var1: CurrencyConverterViewModel): ViewModel
 
     @Module
     companion object {
 
-        @ActivityScope
         @JvmStatic
+        @FragmentScope
         @Provides
-        fun provideDataSource(api:APIService) : ICurrenciesDataSource{
+        fun provideDataSource(api: APIService): ICurrenciesDataSource {
             return CurrenciesRetrofitRemoteDataSource(api)
         }
 
-        @ActivityScope
         @JvmStatic
+        @FragmentScope
         @Provides
-        fun provideRepository(dataSource :ICurrenciesDataSource) : ICurrenciesRepository{
+        fun provideRepository(dataSource: ICurrenciesDataSource): ICurrenciesRepository {
             return CurrenciesRepository(dataSource)
         }
 
-        @ActivityScope
         @JvmStatic
+        @FragmentScope
         @Provides
-        fun provideInteractor(repository :ICurrenciesRepository) : ICurrenciesInteractor{
+        fun provideInteractor(repository: ICurrenciesRepository): ICurrenciesInteractor {
             return CurrenciesInteractor(repository)
         }
     }
+
+
 }

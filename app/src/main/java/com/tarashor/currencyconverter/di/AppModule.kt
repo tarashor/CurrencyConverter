@@ -2,7 +2,7 @@ package com.tarashor.currencyconverter.di
 
 import android.arch.lifecycle.ViewModelProvider
 import com.tarashor.currencyconverter.URL_BASE
-import com.tarashor.currencyconverter.core.ViewModelsProviderFactory
+import com.tarashor.currencyconverter.core.ViewModelProviderFactory
 import com.tarashor.currencyconverter.data.APIService
 import dagger.Binds
 import dagger.Module
@@ -16,7 +16,7 @@ import javax.inject.Singleton
 abstract class AppModule {
 
     @Binds
-    abstract fun bindViewModelFactory(factory: ViewModelsProviderFactory): ViewModelProvider.Factory
+    abstract fun bindViewModelFactory(factory: ViewModelProviderFactory): ViewModelProvider.Factory
 
     @Module
     companion object {

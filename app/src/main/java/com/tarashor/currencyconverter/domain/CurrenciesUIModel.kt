@@ -1,10 +1,11 @@
 package com.tarashor.currencyconverter.domain
 
 import com.tarashor.currencyconverter.di.ActivityScope
+import com.tarashor.currencyconverter.di.FragmentScope
 import com.tarashor.currencyconverter.ui.viewmodel.CurrencyViewModelItem
 import javax.inject.Inject
 
-@ActivityScope
+@FragmentScope
 class CurrenciesUIModel
 @Inject
     constructor(private val interactor: ICurrenciesInteractor) {
