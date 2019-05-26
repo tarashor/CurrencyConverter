@@ -1,9 +1,15 @@
 package com.tarashor.currencyconverter.data
 
 import com.tarashor.currencyconverter.entry.CurrenciesDTO
+import io.reactivex.Flowable
 import java.util.*
 
 class CurrenciesDummyDataSource : ICurrenciesDataSource {
+    override fun getCurrencies(baseCurrency: String?): Flowable<CurrenciesDTO> {
+        val dto = CurrenciesDTO(baseCurrency ?: "", noise())
+        return Flowable.just(dto)
+    }
+
     private val map: Map<String, Double> = mapOf(
         "UAH" to 29.423548,
         "RUB" to 72.288964,
@@ -23,12 +29,6 @@ class CurrenciesDummyDataSource : ICurrenciesDataSource {
         return res
     }
 
-
-    override fun getCurrencies(baseCurrency: String?, callback: (CurrenciesDTO?) -> Unit) {
-        val dto = CurrenciesDTO(baseCurrency ?: "", noise())
-        callback(dto)
-
-    }
 
 
 }

@@ -43,7 +43,10 @@ class CurrencyConverterFragment : DaggerFragment() {
             { currency ->
                 viewModel.updateSelectedCurrency(currency)
             },
-            { currency -> viewModel.updateAmount(currency.amount) })
+            { currency ->
+//                viewModel.updateSelectedCurrency(currency)
+                viewModel.updateAmount(currency.amount)
+            })
 
         binding.currenciesList.preserveFocusAfterLayout = true
 

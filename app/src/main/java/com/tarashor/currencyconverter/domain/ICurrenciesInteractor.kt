@@ -1,17 +1,13 @@
 package com.tarashor.currencyconverter.domain
 
 import com.tarashor.currencyconverter.entry.CurrenciesDTO
+import io.reactivex.Flowable
+import io.reactivex.Observable
 
 interface ICurrenciesInteractor {
-    var baseCurrency: String
-    val currenciesRates : Map<String, Double>
 
-    fun convertAmountToOtherCurrency(
-        amount: Double,
-        selectedCurrency: String?,
-        currencyOut: String?
-    ) : Double
+    fun loadCurrencies(
+        selectedCurrency: Observable<String>, enteredAmount: Observable<Double>
+    ) : Observable<CurrenciesAmount>
 
-    fun reloadCurrencies(onLoaded: () -> Unit, newBaseCurrency: String? = null)
-    fun setCurrenciesRates(DTO: CurrenciesDTO?)
 }

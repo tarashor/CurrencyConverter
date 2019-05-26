@@ -43,13 +43,7 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testGetCurrencies() {
-
-        mCurrenciesRepository.getCurrencies(currency, new Function1<CurrenciesDTO, Unit>() {
-            @Override
-            public Unit invoke(CurrenciesDTO currenciesDTO) {
-                return null;
-            }
-        });
+        mCurrenciesRepository.getCurrencies(currency, (currenciesDTO) -> null);
         verify(mRemoteSearchDataSource)
                 .getCurrencies(ArgumentMatchers.eq(currency),
                         ArgumentMatchers.<Function1<CurrenciesDTO, Unit>>notNull());

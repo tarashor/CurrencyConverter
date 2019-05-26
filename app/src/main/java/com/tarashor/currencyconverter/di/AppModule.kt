@@ -9,6 +9,7 @@ import dagger.Module
 import dagger.Provides
 import retrofit2.Converter
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
@@ -35,6 +36,7 @@ abstract class AppModule {
 
             return Retrofit.Builder()
                 .baseUrl(URL_BASE)
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(converterFactory)
                 .build()
 

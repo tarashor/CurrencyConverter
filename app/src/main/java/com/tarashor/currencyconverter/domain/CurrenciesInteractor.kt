@@ -1,48 +1,51 @@
 package com.tarashor.currencyconverter.domain
 
-import com.tarashor.currencyconverter.entry.CurrenciesDTO
 import com.tarashor.currencyconverter.data.ICurrenciesRepository
-import javax.inject.Inject
+import com.tarashor.currencyconverter.entry.CurrenciesDTO
+import io.reactivex.Observable
+import io.reactivex.functions.BiFunction
 
 
 class CurrenciesInteractor(val repository: ICurrenciesRepository) : ICurrenciesInteractor {
     private val BASE_CURRENCY_ID = "EUR"
+    private val BASE_CURRENCY_AMOUNT = 100.0
 
-    override lateinit var baseCurrency: String
-    override val currenciesRates = hashMapOf<String, Double>()
+    override fun loadCurrencies(selectedCurrency: Observable<String>, enteredAmount: Observable<Double>): Observable<CurrenciesAmount> {
+        val ratesObservale = selectedCurrency
+            .map {
+                if (it.isBlank()) BASE_CURRENCY_ID else it
+            }
+            .flatMap {
+                repository.getCurrencies(it).toObservable()
+            }
 
-    override fun convertAmountToOtherCurrency(
+        return Observable.combineLatest(
+            ratesObservale,
+            enteredAmount.map { if (it < 0) BASE_CURRENCY_AMOUNT else it },
+            BiFunction<CurrenciesDTO, Double, CurrenciesAmount> { rates, amount ->
+                val amounts = hashMapOf<String, Double>()
+                for (rate in rates.rates){
+                    amounts[rate.key] = convertAmountToOtherCurrency(amount, rates.base, rate.key, rates.rates)
+                }
+                CurrenciesAmount(rates.base, amount, amounts)
+            })
+            .onErrorReturn {
+                CurrenciesAmount(BASE_CURRENCY_ID, BASE_CURRENCY_AMOUNT, emptyMap())
+            }
+    }
+
+
+
+
+    private fun convertAmountToOtherCurrency(
         amount: Double,
         selectedCurrency: String?,
-        currencyOut: String?
+        currencyOut: String?,
+        rates : Map<String, Double>
     ) : Double{
-        return if (this::baseCurrency.isInitialized){
-            if (selectedCurrency == baseCurrency){
-                amount  * (currenciesRates[currencyOut]?:1.0)
-            } else {
-                amount / (currenciesRates[selectedCurrency]?:1.0) * (this.currenciesRates[currencyOut]?:1.0)
-            }
-        } else {
-            amount
-        }
+        return amount / (rates[selectedCurrency]?:1.0) * (rates[currencyOut]?:1.0)
+
     }
 
-    override fun reloadCurrencies(onLoaded: () -> Unit, newBaseCurrency: String?){
-        repository.getCurrencies(newBaseCurrency) {
-            setCurrenciesRates(it)
-            onLoaded()
-        }
-    }
-
-    override fun setCurrenciesRates(DTO: CurrenciesDTO?) {
-        currenciesRates.clear()
-        DTO?.rates?.forEach {
-            currenciesRates[it.key] = it.value
-        }
-        DTO?.let {
-            baseCurrency = it.base
-            currenciesRates[it.base] = 1.0
-        }
-    }
 }
 

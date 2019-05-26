@@ -17,7 +17,9 @@ class CurrencyViewHolder(itemView: View,
     protected val idTextView : TextView = itemView.findViewById(R.id.id_tv)
     protected val editText : EditText = itemView.findViewById(R.id.value_edt)
 
-    private var isTextSetsProgramatically = false;
+    var currencyViewModel: CurrencyViewModelItem? = null
+
+    private var isTextSetsProgramatically = false
 
     val textWatcher = object : TextWatcher {
         override fun afterTextChanged(s: Editable?) {}
@@ -26,9 +28,10 @@ class CurrencyViewHolder(itemView: View,
 
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             if (!isTextSetsProgramatically) {
-                currencyViewModel?.amount =
-                    CurrenciesAdapter.parseAmount(s.toString())
-                onCurrencyChanged(currencyViewModel!!)
+                currencyViewModel?.let{
+                    it.amount = CurrenciesAdapter.parseAmount(s.toString())
+                    onCurrencyChanged(it)
+                }
             }
         }
     }
@@ -56,10 +59,8 @@ class CurrencyViewHolder(itemView: View,
         } else {
             editText.removeTextChangedListener(textWatcher)
             itemView.setOnClickListener {
-                if (currencyViewModel != null){
-                    editText.requestFocus()
-                    editText.setSelection(editText.text.length)
-                }
+                editText.requestFocus()
+                editText.setSelection(editText.text.length)
             }
 
             editText.setOnFocusChangeListener { v, hasFocus ->
@@ -72,7 +73,8 @@ class CurrencyViewHolder(itemView: View,
 
     fun willBeShown() {
         currencyViewModel?.let{
-            if (it.isSelected) editText.requestFocus()
+            if (it.isSelected)
+                editText.requestFocus()
         }
     }
 
@@ -81,5 +83,5 @@ class CurrencyViewHolder(itemView: View,
     }
 
 
-    var currencyViewModel: CurrencyViewModelItem? = null
+
 }
