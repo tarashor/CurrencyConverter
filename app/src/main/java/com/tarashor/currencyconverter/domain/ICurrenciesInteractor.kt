@@ -8,6 +8,6 @@ interface ICurrenciesInteractor {
 
     fun loadCurrencies(
         selectedCurrency: Observable<String>, enteredAmount: Observable<Double>
-    ) : Observable<CurrenciesAmount>
+    ) : Flowable<CurrenciesAmount>
 
 }

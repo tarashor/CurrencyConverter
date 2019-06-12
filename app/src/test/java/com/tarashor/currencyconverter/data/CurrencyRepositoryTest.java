@@ -43,10 +43,9 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testGetCurrencies() {
-        mCurrenciesRepository.getCurrencies(currency, (currenciesDTO) -> null);
+        mCurrenciesRepository.getCurrencies(currency);
         verify(mRemoteSearchDataSource)
-                .getCurrencies(ArgumentMatchers.eq(currency),
-                        ArgumentMatchers.<Function1<CurrenciesDTO, Unit>>notNull());
+                .getCurrencies(ArgumentMatchers.eq(currency));
 
     }
 

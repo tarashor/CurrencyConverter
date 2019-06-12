@@ -29,7 +29,8 @@ abstract class FragmentModule {
         @FragmentScope
         @Provides
         fun provideDataSource(api: APIService): ICurrenciesDataSource {
-            return CurrenciesRetrofitRemoteDataSource(api)
+//            return CurrenciesRetrofitRemoteDataSource(api)
+            return CurrenciesDummyDataSource()
         }
 
         @JvmStatic

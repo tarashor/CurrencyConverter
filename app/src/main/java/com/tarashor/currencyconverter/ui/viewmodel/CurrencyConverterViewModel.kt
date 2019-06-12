@@ -2,21 +2,16 @@ package com.tarashor.currencyconverter.ui.viewmodel
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.LiveDataReactiveStreams
-import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import android.util.Log
 import com.tarashor.currencyconverter.di.FragmentScope
 import com.tarashor.currencyconverter.domain.CurrenciesAmount
 import com.tarashor.currencyconverter.domain.ICurrenciesInteractor
-import io.reactivex.BackpressureStrategy
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
-import io.reactivex.subjects.PublishSubject
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledFuture
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @FragmentScope
@@ -38,30 +33,27 @@ class CurrencyConverterViewModel
 
     val items : LiveData<List<CurrencyViewModelItem>>
 
-    private val scheduler = Executors.newSingleThreadScheduledExecutor()
-    private lateinit var scheduledFuture: ScheduledFuture<*>
-
     init{
-        items = LiveDataReactiveStreams.fromPublisher(
-            interactor.loadCurrencies(selectedCurrencyObservable, amountObservable)
-                .toFlowable(BackpressureStrategy.LATEST)
-                .map { build(it) }
-                .subscribeOn(Schedulers.io()))
 
+        val responseObservable = interactor.loadCurrencies(selectedCurrencyObservable, amountObservable)
+            .map { build(it) }
+            .subscribeOn(Schedulers.io())
+            .doOnNext{
+                Log.v("TAG", it.toString())
+            }
 
+        items = LiveDataReactiveStreams.fromPublisher(responseObservable)
 
-        disposable.add(selectedCurrencyObservable.skip(1)
-            .zipWith(selectedCurrencyObservable,
-            BiFunction<String, String, Pair<String, String>> { t1, t2 ->
-                Pair(t1, t2)
-            })
-            .subscribe{
-                history.remove(it.first)
-                history[it.second] = currentHistoryIndex
-                currentHistoryIndex++
-
-            })
-
+        disposable.add(
+            Observable.zip(
+                selectedCurrencyObservable.skip(1),
+                selectedCurrencyObservable,
+                BiFunction<String, String, Boolean> { t1, t2 ->
+                    history.remove(t1)
+                    history[t2] = currentHistoryIndex
+                    currentHistoryIndex++
+                    false
+                }).subscribe())
 
 
 //        selectedCurrencyObservable.onNext("")
@@ -75,23 +67,13 @@ class CurrencyConverterViewModel
     }
 
 
-    fun setAmount(amount: Double) {
+    private fun setAmount(amount: Double) {
         amountObservable.onNext(amount)
     }
 
-    fun setSelectedCurrency(currency: String, amount: Double) {
+    private fun setSelectedCurrency(currency: String) {
         selectedCurrencyObservable.onNext(currency)
-        setAmount(amount)
     }
-
-//    fun reloadRates(function: () -> Unit) {
-//        interactor.reloadCurrencies({
-//            if (selectedCurrency == null){
-//                selectedCurrency = interactor.baseCurrency
-//            }
-//            function()
-//        }, selectedCurrency)
-//    }
 
 
     fun updateAmount(amount : Double){
@@ -99,30 +81,19 @@ class CurrencyConverterViewModel
     }
 
     fun updateSelectedCurrency(currency: CurrencyViewModelItem){
-        setSelectedCurrency(currency.currency, currency.amount)
+        setSelectedCurrency(currency.currency)
+        setAmount(currency.amount)
     }
 
-    fun startPollingCurrencyRates() {
-        scheduledFuture = scheduler.scheduleAtFixedRate(Runnable {
-//            reloadRates{
-//                notifyModelChanged()
-//            }
-        }, 0, UPDATE_INTERVAL_SECONDS, TimeUnit.SECONDS)
-    }
-
-    fun stopPollingCurrencyRates() {
-        scheduledFuture.cancel(true)
-    }
-
-    private fun build(amouts: CurrenciesAmount) : List<CurrencyViewModelItem> {
+    private fun build(amounts: CurrenciesAmount) : List<CurrencyViewModelItem> {
         val models = mutableListOf<CurrencyViewModelItem>()
 
-        models.add(CurrencyViewModelItem(amouts.baseCurrency, amouts.amount, true))
+        models.add(CurrencyViewModelItem(amounts.baseCurrency, amounts.amount, true))
 
         history
-            .filter { amouts.amounts.containsKey(it.key) }
+            .filter { amounts.amounts.containsKey(it.key) }
             .map {
-                val amount = amouts.amounts[it.key]
+                val amount = amounts.amounts[it.key]
                 if (amount == null) null
                 else CurrencyViewModelItem(
                     it.key,
@@ -132,8 +103,8 @@ class CurrencyConverterViewModel
                 )}
             .forEach{ if(it != null) models.add(it)}
 
-        amouts.amounts
-            .filter { it.key != amouts.baseCurrency && !history.contains(it.key) }
+        amounts.amounts
+            .filter { it.key != amounts.baseCurrency && !history.contains(it.key) }
             .map {
                 CurrencyViewModelItem(
                     it.key,
@@ -148,9 +119,6 @@ class CurrencyConverterViewModel
         return models.sorted()
     }
 
-    companion object {
-        private val UPDATE_INTERVAL_SECONDS = 1L
-    }
 }
 
 

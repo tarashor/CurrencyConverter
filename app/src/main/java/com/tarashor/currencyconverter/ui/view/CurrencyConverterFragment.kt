@@ -60,14 +60,5 @@ class CurrencyConverterFragment : DaggerFragment() {
         binding.viewModel = viewModel
     }
 
-    override fun onStart() {
-        super.onStart()
-        viewModel.startPollingCurrencyRates()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        viewModel.stopPollingCurrencyRates()
-    }
 
 }
