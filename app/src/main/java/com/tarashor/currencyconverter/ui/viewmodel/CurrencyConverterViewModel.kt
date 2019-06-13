@@ -19,14 +19,11 @@ class CurrencyConverterViewModel
     @Inject
     constructor(private val interactor : ICurrenciesInteractor)
     : ViewModel() {
+
     private val disposable = CompositeDisposable()
 
     private val selectedCurrencyObservable = BehaviorSubject.createDefault("")
     private val amountObservable = BehaviorSubject.createDefault(-1.0)
-
-//    private val selectedCurrencyObservable = PublishSubject.create<String>()
-//    private val amountObservable = PublishSubject.create<Double>()
-
 
     private val history: MutableMap<String, Long> = hashMapOf()
     private var currentHistoryIndex: Long = 0
@@ -38,9 +35,6 @@ class CurrencyConverterViewModel
         val responseObservable = interactor.loadCurrencies(selectedCurrencyObservable, amountObservable)
             .map { build(it) }
             .subscribeOn(Schedulers.io())
-            .doOnNext{
-                Log.v("TAG", it.toString())
-            }
 
         items = LiveDataReactiveStreams.fromPublisher(responseObservable)
 
@@ -55,9 +49,6 @@ class CurrencyConverterViewModel
                     false
                 }).subscribe())
 
-
-//        selectedCurrencyObservable.onNext("")
-//        amountObservable.onNext(0.0)
 
     }
 

@@ -1,6 +1,7 @@
 package com.tarashor.currencyconverter.di.main
 
 import android.arch.lifecycle.ViewModel
+import com.tarashor.currencyconverter.core.SchedulerProvider
 import com.tarashor.currencyconverter.data.*
 import com.tarashor.currencyconverter.di.FragmentScope
 import com.tarashor.currencyconverter.di.ViewModelKey
@@ -14,7 +15,6 @@ import dagger.multibindings.IntoMap
 
 @Module
 abstract class FragmentModule {
-
 
     @FragmentScope
     @Binds
@@ -44,7 +44,7 @@ abstract class FragmentModule {
         @FragmentScope
         @Provides
         fun provideInteractor(repository: ICurrenciesRepository): ICurrenciesInteractor {
-            return CurrenciesInteractor(repository)
+            return CurrenciesInteractor(repository, SchedulerProvider)
         }
     }
 

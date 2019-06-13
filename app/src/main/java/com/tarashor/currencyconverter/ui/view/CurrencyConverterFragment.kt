@@ -44,7 +44,6 @@ class CurrencyConverterFragment : DaggerFragment() {
                 viewModel.updateSelectedCurrency(currency)
             },
             { currency ->
-//                viewModel.updateSelectedCurrency(currency)
                 viewModel.updateAmount(currency.amount)
             })
 
