@@ -1,9 +1,10 @@
 package com.tarashor.currencyconverter.ui.viewmodel
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.LiveDataReactiveStreams
-import android.arch.lifecycle.ViewModel
+
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.LiveDataReactiveStreams
+import androidx.lifecycle.ViewModel
 import com.tarashor.currencyconverter.di.FragmentScope
 import com.tarashor.currencyconverter.domain.CurrenciesAmount
 import com.tarashor.currencyconverter.domain.ICurrenciesInteractor

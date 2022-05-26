@@ -1,9 +1,5 @@
 package com.tarashor.currencyconverter.data;
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule;
-import com.tarashor.currencyconverter.entry.CurrenciesDTO;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function1;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,6 +9,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Mockito.verify;
+
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 
 public class CurrencyRepositoryTest {
 

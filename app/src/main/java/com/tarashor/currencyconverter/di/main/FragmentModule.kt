@@ -1,6 +1,6 @@
 package com.tarashor.currencyconverter.di.main
 
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.ViewModel
 import com.tarashor.currencyconverter.core.SchedulerProvider
 import com.tarashor.currencyconverter.data.*
 import com.tarashor.currencyconverter.di.FragmentScope

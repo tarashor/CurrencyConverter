@@ -1,6 +1,6 @@
 package com.tarashor.currencyconverter.di
 
-import android.arch.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider
 import com.tarashor.currencyconverter.URL_BASE
 import com.tarashor.currencyconverter.core.ViewModelProviderFactory
 import com.tarashor.currencyconverter.data.APIService
@@ -19,18 +19,15 @@ abstract class AppModule {
     @Binds
     abstract fun bindViewModelFactory(factory: ViewModelProviderFactory): ViewModelProvider.Factory
 
-    @Module
     companion object {
 
         @Singleton
-        @JvmStatic
         @Provides
         fun provideConvertFactory() : Converter.Factory {
             return GsonConverterFactory.create()
         }
 
         @Singleton
-        @JvmStatic
         @Provides
         fun provideRetrofit(converterFactory: Converter.Factory) : Retrofit {
 
@@ -43,11 +40,10 @@ abstract class AppModule {
         }
 
         @Singleton
-        @JvmStatic
         @Provides
         fun provideAPI(retrofit: Retrofit): APIService {
 
-            return retrofit.create<APIService>(APIService::class.java)
+            return retrofit.create(APIService::class.java)
         }
     }
 }

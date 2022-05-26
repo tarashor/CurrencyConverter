@@ -1,20 +1,20 @@
 package com.tarashor.currencyconverter
 
-import android.app.Activity
+import androidx.appcompat.app.AppCompatActivity
 import android.app.Application
 import com.tarashor.currencyconverter.di.AppComponent
 import com.tarashor.currencyconverter.di.DaggerAppComponent
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasActivityInjector
+import dagger.android.HasAndroidInjector
 import javax.inject.Inject
 
-class BaseApplication : Application(), HasActivityInjector {
+class BaseApplication : Application(), HasAndroidInjector {
 
     private lateinit var appComponent: AppComponent
 
     @Inject
-    lateinit var activityInjector: DispatchingAndroidInjector<Activity>
+    lateinit var androidInjector: DispatchingAndroidInjector<Any>
 
 
     override fun onCreate() {
@@ -23,7 +23,6 @@ class BaseApplication : Application(), HasActivityInjector {
         appComponent.inject(this)
     }
 
-    override fun activityInjector(): AndroidInjector<Activity>? {
-        return activityInjector
-    }
+
+    override fun androidInjector(): AndroidInjector<Any> = androidInjector
 }

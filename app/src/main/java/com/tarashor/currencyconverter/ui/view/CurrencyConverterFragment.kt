@@ -1,13 +1,12 @@
 package com.tarashor.currencyconverter.ui.view
 
-import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.tarashor.currencyconverter.databinding.CurrencyConverterFragmentBinding
 
 import com.tarashor.currencyconverter.ui.adapter.CurrenciesAdapter

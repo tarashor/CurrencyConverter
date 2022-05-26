@@ -1,7 +1,8 @@
 package com.tarashor.currencyconverter.core;
 
-import android.arch.lifecycle.ViewModel;
-import android.arch.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.tarashor.currencyconverter.di.ActivityScope;
 import com.tarashor.currencyconverter.di.FragmentScope;
 

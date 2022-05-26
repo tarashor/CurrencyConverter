@@ -1,9 +1,9 @@
 package com.tarashor.currencyconverter.ui.adapter
 
-import android.support.v7.recyclerview.extensions.ListAdapter
-import android.support.v7.util.DiffUtil
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import com.tarashor.currencyconverter.R
 import com.tarashor.currencyconverter.ui.viewmodel.CurrencyViewModelItem
 import java.lang.Exception
