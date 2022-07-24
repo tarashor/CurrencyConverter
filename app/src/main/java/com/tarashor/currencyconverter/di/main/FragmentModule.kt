@@ -22,7 +22,6 @@ abstract class FragmentModule {
     @ViewModelKey(CurrencyConverterViewModel::class)
     abstract fun bindCurrencyConverterViewModel(var1: CurrencyConverterViewModel): ViewModel
 
-    @Module
     companion object {
 
         @JvmStatic
